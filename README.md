@@ -21,11 +21,11 @@ Now enter the expression that needs to be evaluated.
 
 ### Expression Docs
 The expression is of three types:
-* Number: This is an INTEGER (only as of now) and you need to directly enter the number, eg `5` is an expression but `5.0` will give an error
-* Function: There are two functions as of now:
-    * `sqrt`: This takes an `expression` and returns the square root of the evaluted `expression`. i.e. I can write `sqrt(4)` and this will be evauated to `2`.
-    * `ifzero`: This function has the syntax: `ifzero(<expression1> ? <expression2> : <expression3>)`. `<expression1>` is the condition that will be evaluated and checked if it is zero or not. If `<expression1>` turns out to be zero then, the function will return `<expression2>`, else it will return `<expression3>`.
-* Binary Operations: This will always be enclosed within brackets, i.e the syntax is `(<expression1> <OPERATOR> <expression2>)`. Here `<OPERATOR>` can be anything from the list: [`+`,`-`,`/`,`*`,`^`]. The meaning of each operator is defined below:
+* **Number**: This is an INTEGER (only as of now) and you need to directly enter the number, eg `5` is an expression but `5.0` will give an error
+* **Function**: There are two functions as of now:
+    * **sqrt**: This takes an `expression` and returns the square root of the evaluted `expression`. i.e. I can write `sqrt(4)` and this will be evauated to `2`.
+    * **ifzero**: This function has the syntax: `ifzero(<expression1> ? <expression2> : <expression3>)`. `<expression1>` is the condition that will be evaluated and checked if it is zero or not. If `<expression1>` turns out to be zero then, the function will return `<expression2>`, else it will return `<expression3>`.
+* **Binary Operations**: This will always be enclosed within brackets, i.e the syntax is `(<expression1> <OPERATOR> <expression2>)`. Here `<OPERATOR>` can be anything from the list: [`+`,`-`,`/`,`*`,`^`]. The meaning of each operator is defined below:
     | Operator | Meaning                                        | Example | Result |
     |:--------:|------------------------------------------------|:-------:|:------:|
     | +        | Adds two entities                              | 2+2     | 4      |
