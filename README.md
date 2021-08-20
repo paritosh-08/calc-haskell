@@ -4,7 +4,7 @@ An awesome (?) calculator in Haskell.
 ## What can I do with this?
 You can do a lot of things with this piece of code:
 * Show someone the worst way to parse an expression.
-* Delete the code and save some space for gifs like [this](https://i.imgur.com/hbgtV4y.gif).
+* Delete the code and save some space for gifs like [this](https://i.ibb.co/XshDfjS/awesome.gif "Awesome GIF").
 * Do some simple calculations (if you have a lot of time).
 
 ## I want to do some calculations
