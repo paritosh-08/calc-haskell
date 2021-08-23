@@ -72,7 +72,7 @@ parseSQRT :: Parser Expression
 parseSQRT = do
   t <- chunk "sqrt"
   _ <- symbol "("
-  x <- parseNumber <|> parseExp
+  x <- parseNumber <|> parseExpression
   _ <- symbol ")"
   pure (SQR x)
 
@@ -80,10 +80,10 @@ parseIFz :: Parser Expression
 parseIFz = do
   _ <- chunk "ifzero"
   _ <- symbol "("
-  x <- parseNumber <|> parseExp
+  x <- parseNumber <|> parseExpression
   _ <- symbol "?"
-  y <- parseNumber <|> parseExp
+  y <- parseNumber <|> parseExpression
   _ <- symbol ":"
-  z <- parseNumber <|> parseExp
+  z <- parseNumber <|> parseExpression
   _ <- symbol ")"
   pure (IfZ x y z)
