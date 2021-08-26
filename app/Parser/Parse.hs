@@ -39,7 +39,7 @@ floatingNum :: Parser Double
 floatingNum = L.float
 
 parseNumber :: Parser Expression
-parseNumber = Number <$> signedDouble
+parseNumber = Number <$> (try floatingNum <|> signedDouble)
 
 parens :: Parser a -> Parser a
 parens = between (symbol "(") (symbol ")")

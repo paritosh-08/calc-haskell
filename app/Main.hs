@@ -14,9 +14,8 @@ main :: IO ()
 main = do
   putStrLn "Enter an expression:"
   e <- getLine
-  let expr = parseMaybe parseExpression e
-  case expr of 
-    Nothing -> putStrLn "Something went wrong"
-    Just expr' -> do
+  case runParser parseExpression "input" e of 
+    Left err -> putStrLn (errorBundlePretty err)
+    Right expr' -> do
       res <- runExceptT (evaluate expr')
       print res
