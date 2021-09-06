@@ -23,17 +23,26 @@ extra-source-files: CHANGELOG.md
 
 executable myCalc
     main-is:          Main.hs
+    build-depends:    base ^>=4.14.1.0
+                    , myCalc
+                    , text
+                    , megaparsec
+                    , mtl
+    hs-source-dirs:   app
+    default-language: Haskell2010
 
-    -- Modules included in this executable, other than Main.
-    other-modules:    Parser.Parse
+library
+    hs-source-dirs:   src-lib
+    exposed-modules:  Calculator.Calculate
+                    , Parser.Parse
                     , Calculator.Types
-                    , Calculator.Calculate
-
-    -- LANGUAGE extensions used by modules in this package.
-    -- other-extensions:
     build-depends:    base ^>=4.14.1.0
                     , mtl
                     , megaparsec
                     , text
-    hs-source-dirs:   app
-    default-language: Haskell2010
+
+test-suit myCalc-test
+    hs-source-dirs:   src-test
+    main-is:          Main.hs
+    build-depends:    base ^>=4.14.1.0
+                    , QuickCheck
