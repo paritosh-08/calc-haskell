@@ -21,6 +21,13 @@ maintainer:         paritosh@hasura.io
 -- category:
 extra-source-files: CHANGELOG.md
 
+Test-Suit myCalc-test
+    type:             exitcode-stdio-1.0
+    hs-source-dirs:   src-test
+    main-is:          Main.hs
+    build-depends:    base ^>=4.14.1.0
+                    , QuickCheck
+
 executable myCalc
     main-is:          Main.hs
     build-depends:    base ^>=4.14.1.0
@@ -40,9 +47,3 @@ library
                     , mtl
                     , megaparsec
                     , text
-
-test-suit myCalc-test
-    hs-source-dirs:   src-test
-    main-is:          Main.hs
-    build-depends:    base ^>=4.14.1.0
-                    , QuickCheck
