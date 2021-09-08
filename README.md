@@ -5,7 +5,7 @@ An awesome (?) calculator in Haskell.
 You can do a lot of things with this piece of code:
 * Show someone the worst way to parse an expression.
 * Delete the code and save some space for gifs like [this](https://i.ibb.co/XshDfjS/awesome.gif "Awesome GIF").
-* Do some simple calculations (if you have a lot of time).
+* Do some simple calculations (if you really want to).
 
 ## I want to do some calculations
 If you really want to do calculations then please follow the following:
