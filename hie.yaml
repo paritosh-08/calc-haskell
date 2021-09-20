@@ -1,0 +1,10 @@
+cradle:
+  cabal:
+    - path: "src-test"
+      component: "myCalc:test:myCalc-test"
+
+    - path: "app/Main.hs"
+      component: "myCalc:exe:myCalc"
+
+    - path: "src-lib"
+      component: "lib:myCalc"

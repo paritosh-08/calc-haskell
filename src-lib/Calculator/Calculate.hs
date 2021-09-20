@@ -1,8 +1,33 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 module Calculator.Calculate where
 
 import Control.Monad.Except
+import Control.Monad.Writer.Strict
+import Test.QuickCheck
 
 import Calculator.Types
+
+noErrors e = case eval e of
+  Left{} -> False
+  Right{} -> True
+
+instance Arbitrary Expression where
+  arbitrary = suchThat (sized genExpr) noErrors
+
+newtype BadExpr = BadExpr { good :: Expression }
+  deriving (Show)
+
+instance Arbitrary BadExpr where
+  arbitrary = suchThat (sized (\n -> BadExpr <$> genExpr n)) (not . noErrors . good)
+
+type CalcMonad = WriterT [String] (Except CalcException) Double
+
+eval :: Expression -> Either CalcException (Double, [String])
+eval x = let
+  x' :: CalcMonad = evaluate x
+  x'' :: Except CalcException (Double, [String]) = runWriterT x'
+  x''' = runExcept x''
+  in x'''
 
 addF :: Double -> Double -> CalcMonad
 addF a b = return (a + b)
@@ -44,7 +69,7 @@ evaluate (Operator op x y) = do
           y'' <- catchError (evaluate y) (\e -> case e of
             DivideByZeroError -> if x' == 0 
               then do
-                liftIO $ print "Error"
+                tell ["Error"]
                 return 0 
               else throwError e
             _ -> throwError e)
