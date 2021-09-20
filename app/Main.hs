@@ -17,5 +17,4 @@ main = do
   case runParser parseExpression "input" e of 
     Left err -> putStrLn (errorBundlePretty err)
     Right expr' -> do
-      res <- runExceptT (evaluate expr')
-      print res
+      print $ eval expr'
