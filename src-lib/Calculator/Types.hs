@@ -6,7 +6,7 @@ import GHC.Generics
 import Test.QuickCheck
 import Test.QuickCheck.Arbitrary.Generic
 
-data CalcException = NegativeSQRTError | DivideByZeroError | IncompatibleExp deriving (Show, Eq)
+data CalcException = NegativeSQRTError | DivideByZeroError | IncompatibleExp | NonRealNumberError deriving (Show, Eq)
 
 data Op = Add | Sub | Div | Mult | Pow | Err deriving (Show, Generic)
 

@@ -53,7 +53,10 @@ ifZero 0 x _ = return x
 ifZero _ _ y = return y
 
 powF :: Double -> Double -> CalcMonad
-powF x y = return $ x**y
+powF x y =
+  if (x < 0) && (snd (properFraction y) /= 0)
+    then throwError NonRealNumberError
+    else return $ x**y
 
 evaluate :: Expression -> CalcMonad
 evaluate (Number x) = return x
@@ -67,10 +70,10 @@ evaluate (Operator op x y) = do
         Pow -> powF
         Mult -> (\p _ -> do
           y'' <- catchError (evaluate y) (\e -> case e of
-            DivideByZeroError -> if x' == 0 
+            DivideByZeroError -> if x' == 0
               then do
                 tell ["Error"]
-                return 0 
+                return 0
               else throwError e
             _ -> throwError e)
           multiplyF p y''
@@ -88,7 +91,7 @@ evaluate (Operator op x y) = do
       else throwError e
     _ -> throwError e)
   multiplyF x' y' -}
-  
+
 evaluate (SQR x) = do
   x' <- evaluate x
   mySQRT x'

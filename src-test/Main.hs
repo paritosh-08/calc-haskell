@@ -16,14 +16,25 @@ import Control.Monad.IO.Class
 data InvPair = InvPair Double Double
 
 -- InvPair a a¯¹
-instance Arbitrary InvPair
+-- instance Arbitrary InvPair
 
--- ∀ x y. x + y = y + x
+-- ∀ x y, x + y = y + x
 prop_add_comm :: Expression -> Expression -> Property
 prop_add_comm x y = eval (Operator Add x y) === eval (Operator Add y x)
 
 prop_mul_comm :: Expression -> Expression -> Property
 prop_mul_comm x y = eval (Operator Mult x y) === eval (Operator Mult y x)
+
+-- ∀ x y z, ((x + y) + z) = (x + (y + z))
+prop_add_asso :: Expression -> Expression -> Expression -> Property
+prop_add_asso x y z = eval (Operator Add (Operator Add x y) z) === eval (Operator Add x (Operator Add y z))
+
+prop_mul_asso :: Expression -> Expression -> Expression -> Property
+prop_mul_asso x y z = eval (Operator Mult (Operator Mult x y) z) === eval (Operator Mult x (Operator Mult y z))
+
+-- ∀ x y z, ((x + y) ⋅ z) = ((x ⋅ z) + (y ⋅ z))
+prop_distribu :: Expression -> Expression -> Expression -> Property
+prop_distribu x y z = eval (Operator Mult (Operator Add x y) z) === eval (Operator Add (Operator Mult x z) (Operator Mult y z))
 
 prop_add_fail_comm :: BadExpr -> BadExpr -> Property
 prop_add_fail_comm (BadExpr x) (BadExpr y) = eval (Operator Add x y) === eval (Operator Add y x)
@@ -38,3 +49,6 @@ main = do
   -- sample (resize 2 $ arbitrary @Expression)
   quickCheckWith (stdArgs) prop_add_comm
   quickCheckWith (stdArgs) prop_mul_comm
+  quickCheckWith (stdArgs) prop_add_asso
+  quickCheckWith (stdArgs) prop_mul_asso
+  quickCheckWith (stdArgs) prop_distribu
