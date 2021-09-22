@@ -8,7 +8,7 @@ import Test.QuickCheck.Arbitrary.Generic
 
 data CalcException = NegativeSQRTError | DivideByZeroError | IncompatibleExp deriving (Show, Eq)
 
-data Op = Add | Sub | Div | Mult | Pow | Err deriving (Show, Generic)
+data Op = Add | Sub | Div | Mult | Pow | Err deriving (Eq, Show, Generic)
 
 instance Arbitrary Op where
   arbitrary = genericArbitrary
@@ -19,10 +19,21 @@ data Expression =
   | SQR Expression
   | IfZ Expression Expression Expression
   --- | Mult Expression Expression
-  deriving (Show, Generic)
+  deriving (Eq, Show, Generic)
 
--- pretty :: Expression -> Text
--- pretty = error "TODO"
+toStrOp :: Op -> String
+toStrOp Add = "+"
+toStrOp Sub = "-"
+toStrOp Div = "/"
+toStrOp Mult = "*"
+toStrOp Pow = "^"
+toStrOp Err = "This should not happen"
+
+pretty :: Expression -> String
+pretty (Number n) = show n
+pretty (Operator op exp1 exp2) = "(" ++ pretty exp1 ++ toStrOp op ++ pretty exp2 ++ ")"
+pretty (SQR exp1) = "sqrt(" ++ pretty exp1 ++ ")"
+pretty (IfZ exp1 exp2 exp3) = "ifzero(" ++ pretty exp1 ++ "?" ++ pretty exp2 ++ ":" ++ pretty exp3 ++ ")"
 
 genExpr :: Int -> Gen Expression
 genExpr 1 = genNumber
