@@ -33,7 +33,7 @@ prop_add_fail_comm (BadExpr x) (BadExpr y) = eval (Operator Add x y) === eval (O
 
 -- TODO : handle nonzero z, failing - decimal digits don't match (after 7-8 places)
 prop_div_ratio :: Expression -> Expression -> Expression -> Property
-prop_div_ratio x y z = eval (Operator Div x y) === eval (Operator Div (Operator Div x z) (Operator Div y z))
+prop_div_ratio x y z = eval (Operator Div x y) === eval (Operator Div (Operator Div x z) (Operator Div y z)) -- (x/y) = ((x/z)* (y/z))
   -- z /= 0 ==> eval (Operator Div x y) === eval (Operator Div (Operator Div x z) (Operator Div y z))
 
 -- Number (-0.2527207028827523)
@@ -41,25 +41,20 @@ prop_div_ratio x y z = eval (Operator Div x y) === eval (Operator Div (Operator 
 -- SQR (Number 0.0)
 -- Right (NaN,[]) /= Right (NaN,[])
 prop_prod_of_pow :: Expression -> Expression -> Expression -> Property 
-prop_prod_of_pow x y z = eval (Operator Mult (Operator Pow x y) (Operator Pow x z)) === eval (Operator Pow x (Operator Add y z))
+prop_prod_of_pow x y z = eval (Operator Mult (Operator Pow x y) (Operator Pow x z)) === eval (Operator Pow x (Operator Add y z)) -- Property -> (x^y)(x^z) = x^(y+z)
 
 -- decimal digits don't match (after 7-8 places)
--- TODO: both positive or both negative
+-- TODO: handle both negative case
 prop_sqrt_prod :: Expression -> Expression -> Property
-prop_sqrt_prod x y = eval (Operator Mult (SQR x) (SQR y)) === eval (SQR (Operator Mult x y))
+prop_sqrt_prod x y = eval (Operator Mult (SQR x) (SQR y)) === eval (SQR (Operator Mult x y)) -- Property -> (sqrt x)(sqrt y) = (sqrt x*y)
 
 main :: IO ()
 main = do
   sample (arbitrary @Double)
   -- sample (resize 1 $ arbitrary @Expression)
   -- sample (resize 2 $ arbitrary @Expression)
-  putStrLn "prop_add_comm"
   quickCheckWith (stdArgs) prop_add_comm
-  putStrLn "prop_mul_comm"
   quickCheckWith (stdArgs) prop_mul_comm
-  putStrLn "prop_div_ratio"
   quickCheckWith (stdArgs) prop_div_ratio
-  putStrLn "prop_prod_of_pow"
   quickCheckWith (stdArgs) prop_prod_of_pow
-  putStrLn "prop_sqrt_prod"
   quickCheckWith (stdArgs) prop_sqrt_prod
