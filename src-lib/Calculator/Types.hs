@@ -13,7 +13,7 @@ data Op = Add | Sub | Div | Mult | Pow | Err deriving (Show, Generic)
 instance Arbitrary Op where
   arbitrary = genericArbitrary
 
-data Expression = 
+data Expression =
     Number Double
   | Operator Op Expression Expression -- binary
   | SQR Expression
@@ -36,3 +36,22 @@ genOp n = Operator <$> (arbitrary :: Gen Op) <*> genExpr (n - 1) <*> genExpr (n 
 genSqr n = SQR <$> genExpr (n - 1)
 genIfz n = IfZ <$> genExpr (n - 1) <*> genExpr (n - 1) <*> genExpr (n - 1)
 
+genNonZeroNumber :: Gen Expression
+genNonZeroNumber = Number <$> nonzero
+
+nonzero :: Gen Double
+nonzero = do
+    x <- chooseAny
+    if x == 0
+        then nonzero
+        else pure x
+
+genPositiveZeroNumber :: Gen Expression
+genPositiveZeroNumber = Number <$> positiveNumber
+
+positiveNumber :: Gen Double
+positiveNumber = do
+    x <- chooseAny
+    if x <= 0
+        then positiveNumber
+        else pure x

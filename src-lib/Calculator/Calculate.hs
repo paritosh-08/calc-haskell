@@ -29,6 +29,10 @@ eval x = let
   x''' = runExcept x''
   in x'''
 
+-- round' :: Double -> Integer -> Double
+-- round' num sg = (fromIntegral . round $ num * f) / f
+--     where f = 10^sg
+
 addF :: Double -> Double -> CalcMonad
 addF a b = return (a + b)
 
@@ -67,10 +71,10 @@ evaluate (Operator op x y) = do
         Pow -> powF
         Mult -> (\p _ -> do
           y'' <- catchError (evaluate y) (\e -> case e of
-            DivideByZeroError -> if x' == 0 
+            DivideByZeroError -> if x' == 0
               then do
                 tell ["Error"]
-                return 0 
+                return 0
               else throwError e
             _ -> throwError e)
           multiplyF p y''
@@ -88,7 +92,7 @@ evaluate (Operator op x y) = do
       else throwError e
     _ -> throwError e)
   multiplyF x' y' -}
-  
+
 evaluate (SQR x) = do
   x' <- evaluate x
   mySQRT x'
