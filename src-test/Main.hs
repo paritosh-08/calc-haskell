@@ -42,6 +42,23 @@ prop_add_fail_comm (BadExpr x) (BadExpr y) = eval (Operator Add x y) === eval (O
   --   x = Number 1.0
   --   y = Number 2.0
 
+-- TODO : handle nonzero z, failing - decimal digits don't match (after 7-8 places)
+prop_div_ratio :: Expression -> Expression -> Expression -> Property
+prop_div_ratio x y z = eval (Operator Div x y) === eval (Operator Div (Operator Div x z) (Operator Div y z)) -- (x/y) = ((x/z)* (y/z))
+  -- z /= 0 ==> eval (Operator Div x y) === eval (Operator Div (Operator Div x z) (Operator Div y z))
+
+-- Number (-0.2527207028827523)
+-- Number (-0.9975129380016794)
+-- SQR (Number 0.0)
+-- Right (NaN,[]) /= Right (NaN,[])
+prop_prod_of_pow :: Expression -> Expression -> Expression -> Property 
+prop_prod_of_pow x y z = eval (Operator Mult (Operator Pow x y) (Operator Pow x z)) === eval (Operator Pow x (Operator Add y z)) -- Property -> (x^y)(x^z) = x^(y+z)
+
+-- decimal digits don't match (after 7-8 places)
+-- TODO: handle both negative case
+prop_sqrt_prod :: Expression -> Expression -> Property
+prop_sqrt_prod x y = eval (Operator Mult (SQR x) (SQR y)) === eval (SQR (Operator Mult x y)) -- Property -> (sqrt x)(sqrt y) = (sqrt x*y)
+
 main :: IO ()
 main = do
   sample (arbitrary @Double)
@@ -52,3 +69,6 @@ main = do
   quickCheckWith (stdArgs) prop_add_asso
   quickCheckWith (stdArgs) prop_mul_asso
   quickCheckWith (stdArgs) prop_distribu
+  quickCheckWith (stdArgs) prop_div_ratio
+  quickCheckWith (stdArgs) prop_prod_of_pow
+  quickCheckWith (stdArgs) prop_sqrt_prod

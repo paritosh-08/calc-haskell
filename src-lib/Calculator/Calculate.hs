@@ -29,6 +29,10 @@ eval x = let
   x''' = runExcept x''
   in x'''
 
+-- round' :: Double -> Integer -> Double
+-- round' num sg = (fromIntegral . round $ num * f) / f
+--     where f = 10^sg
+
 addF :: Double -> Double -> CalcMonad
 addF a b = return (a + b)
 
