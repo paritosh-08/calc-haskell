@@ -36,7 +36,7 @@ signedDouble = L.signed spaceConsumer float
     float = lexeme L.decimal
 
 floatingNum :: Parser Double
-floatingNum = L.float
+floatingNum = L.signed spaceConsumer L.float
 
 parseNumber :: Parser Expression
 parseNumber = Number <$> (try floatingNum <|> signedDouble)
