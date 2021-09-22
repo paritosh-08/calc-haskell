@@ -6,6 +6,8 @@ import Test.QuickCheck.Monadic
 import Calculator.Types
 import Calculator.Calculate
 import Control.Monad.IO.Class
+import Text.Megaparsec
+import Parser.Parse
 
 -- prop_RevRev :: [Char] -> Bool
 -- prop_RevRev xs = reverse (reverse xs) == xs
@@ -48,6 +50,11 @@ prop_prod_of_pow x y z = eval (Operator Mult (Operator Pow x y) (Operator Pow x 
 prop_sqrt_prod :: Expression -> Expression -> Property
 prop_sqrt_prod x y = eval (Operator Mult (SQR x) (SQR y)) === eval (SQR (Operator Mult x y)) -- Property -> (sqrt x)(sqrt y) = (sqrt x*y)
 
+prop_pretty_parse_round_trip :: Expression -> Property
+prop_pretty_parse_round_trip exp = case runParser parseExpression "inp" (pretty exp) of
+  Left peb -> error "Panic"
+  Right any -> any === exp
+
 main :: IO ()
 main = do
   sample (arbitrary @Double)
@@ -58,3 +65,4 @@ main = do
   quickCheckWith (stdArgs) prop_div_ratio
   quickCheckWith (stdArgs) prop_prod_of_pow
   quickCheckWith (stdArgs) prop_sqrt_prod
+  quickCheckWith (stdArgs) prop_pretty_parse_round_trip
