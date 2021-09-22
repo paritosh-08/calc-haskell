@@ -57,7 +57,10 @@ ifZero 0 x _ = return x
 ifZero _ _ y = return y
 
 powF :: Double -> Double -> CalcMonad
-powF x y = return $ x**y
+powF x y =
+  if (x < 0) && (snd (properFraction y) /= 0)
+    then throwError NonRealNumberError
+    else return $ x**y
 
 evaluate :: Expression -> CalcMonad
 evaluate (Number x) = return x
