@@ -7,6 +7,9 @@ import Test.QuickCheck
 
 import Calculator.Types
 
+import Numeric
+import Data.Ratio
+
 noErrors e = case eval e of
   Left{} -> False
   Right{} -> True
@@ -20,47 +23,47 @@ newtype BadExpr = BadExpr { good :: Expression }
 instance Arbitrary BadExpr where
   arbitrary = suchThat (sized (\n -> BadExpr <$> genExpr n)) (not . noErrors . good)
 
-type CalcMonad = WriterT [String] (Except CalcException) Double
+type CalcMonad = WriterT [String] (Except CalcException) Rational
 
-eval :: Expression -> Either CalcException (Double, [String])
+eval :: Expression -> Either CalcException (Rational, [String])
 eval x = let
   x' :: CalcMonad = evaluate x
-  x'' :: Except CalcException (Double, [String]) = runWriterT x'
+  x'' :: Except CalcException (Rational, [String]) = runWriterT x'
   x''' = runExcept x''
   in x'''
 
--- round' :: Double -> Integer -> Double
+-- round' :: Rational -> Integer -> Rational
 -- round' num sg = (fromIntegral . round $ num * f) / f
 --     where f = 10^sg
 
-addF :: Double -> Double -> CalcMonad
+addF :: Rational -> Rational -> CalcMonad
 addF a b = return (a + b)
 
-subtractF :: Double -> Double -> CalcMonad
+subtractF :: Rational -> Rational -> CalcMonad
 subtractF a b = return (a - b)
 
-multiplyF :: Double -> Double -> CalcMonad
+multiplyF :: Rational -> Rational -> CalcMonad
 multiplyF a b = return (a * b)
 
-divideF :: Double -> Double -> CalcMonad
+divideF :: Rational -> Rational -> CalcMonad
 divideF _ 0 = throwError DivideByZeroError
 divideF a b = return (a / b)
 
-mySQRT :: Double -> CalcMonad
+mySQRT :: Rational -> CalcMonad
 mySQRT x =
   if x < 0
     then throwError NegativeSQRTError
-    else return $ sqrt x
+    else return . toRational $ sqrt (fromRational x)
 
-ifZero :: Double -> Double -> Double -> CalcMonad
+ifZero :: Rational -> Rational -> Rational -> CalcMonad
 ifZero 0 x _ = return x
 ifZero _ _ y = return y
 
-powF :: Double -> Double -> CalcMonad
+powF :: Rational -> Rational -> CalcMonad
 powF x y =
   if (x < 0) && (snd (properFraction y) /= 0)
     then throwError NonRealNumberError
-    else return $ x**y
+    else return . toRational $ fromRational x ** fromRational y
 
 evaluate :: Expression -> CalcMonad
 evaluate (Number x) = return x

@@ -7,6 +7,7 @@ import qualified Text.Megaparsec.Char as M
 import qualified Text.Megaparsec.Char.Lexer as L
 
 import Calculator.Types
+import Data.Ratio
 
 type Parser a = Parsec Void String a
 
@@ -38,8 +39,19 @@ signedDouble = L.signed spaceConsumer float
 floatingNum :: Parser Double
 floatingNum = L.signed spaceConsumer L.float
 
+fractionalNum :: Parser Rational
+fractionalNum = do
+  num <- signedDouble <* spaceConsumer
+  _ <- symbol "%" <* spaceConsumer
+  den <- signedDouble
+  pure (round num % round den)
+
+
 parseNumber :: Parser Expression
-parseNumber = Number <$> (try floatingNum <|> signedDouble)
+parseNumber =  try 
+      (Number . toRational <$> floatingNum )
+  <|> (try (Number <$> fractionalNum)
+  <|> (Number . toRational <$> signedDouble))
 
 parens :: Parser a -> Parser a
 parens = between (symbol "(") (symbol ")")

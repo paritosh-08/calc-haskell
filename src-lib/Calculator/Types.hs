@@ -6,6 +6,9 @@ import GHC.Generics
 import Test.QuickCheck
 import Test.QuickCheck.Arbitrary.Generic
 
+import Data.Ratio
+import Numeric
+
 data CalcException = NegativeSQRTError | DivideByZeroError | IncompatibleExp | NonRealNumberError deriving (Show, Eq)
 
 data Op = Add | Sub | Div | Mult | Pow | Err deriving (Eq, Show, Generic)
@@ -14,7 +17,7 @@ instance Arbitrary Op where
   arbitrary = genericArbitrary
 
 data Expression =
-    Number Double
+    Number Rational 
   | Operator Op Expression Expression -- binary
   | SQR Expression
   | IfZ Expression Expression Expression
@@ -30,7 +33,7 @@ toStrOp Pow = "^"
 toStrOp Err = "This should not happen"
 
 pretty :: Expression -> String
-pretty (Number n) = show n
+pretty (Number n) =  show (numerator n) ++ "%" ++ show (denominator n)
 pretty (Operator op exp1 exp2) = "(" ++ pretty exp1 ++ toStrOp op ++ pretty exp2 ++ ")"
 pretty (SQR exp1) = "sqrt(" ++ pretty exp1 ++ ")"
 pretty (IfZ exp1 exp2 exp3) = "ifzero(" ++ pretty exp1 ++ "?" ++ pretty exp2 ++ ":" ++ pretty exp3 ++ ")"
@@ -40,7 +43,7 @@ genExpr 1 = genNumber
 genExpr n = frequency [ (1, genNumber), (3, genOp n), (3, genSqr n), (3, genIfz n) ]
 
 genNumber :: Gen Expression
-genNumber = Number <$> (arbitrary :: Gen Double)
+genNumber = Number <$> (arbitrary :: Gen Rational)
 
 genOp, genSqr, genIfz :: Int -> Gen Expression
 genOp n = Operator <$> (arbitrary :: Gen Op) <*> genExpr (n - 1) <*> genExpr (n - 1)
@@ -50,9 +53,10 @@ genIfz n = IfZ <$> genExpr (n - 1) <*> genExpr (n - 1) <*> genExpr (n - 1)
 genNonZeroNumber :: Gen Expression
 genNonZeroNumber = Number <$> nonzero
 
-nonzero :: Gen Double
+nonzero :: Gen Rational
 nonzero = do
-    x <- chooseAny
+    x' <- chooseAny :: Gen Double
+    let x = toRational x
     if x == 0
         then nonzero
         else pure x
@@ -60,9 +64,10 @@ nonzero = do
 genPositiveZeroNumber :: Gen Expression
 genPositiveZeroNumber = Number <$> positiveNumber
 
-positiveNumber :: Gen Double
+positiveNumber :: Gen Rational
 positiveNumber = do
-    x <- chooseAny
+    x' <- chooseAny :: Gen Double
+    let x = toRational x
     if x <= 0
         then positiveNumber
         else pure x

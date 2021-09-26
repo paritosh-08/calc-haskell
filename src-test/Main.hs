@@ -88,10 +88,10 @@ main = do
   -- sample (resize 2 $ arbitrary @Expression)
   quickCheckWith (stdArgs) prop_add_comm                  -- ✓
   quickCheckWith (stdArgs) prop_mul_comm                  -- ✓
-  quickCheckWith (stdArgs) prop_add_asso                  -- ❌
-  quickCheckWith (stdArgs) prop_mul_asso                  -- ❌
-  quickCheckWith (stdArgs) prop_distribu                  -- ❌
-  quickCheckWith (stdArgs) prop_div_ratio                 -- ❌
+  quickCheckWith (stdArgs) prop_add_asso                  -- ✓
+  quickCheckWith (stdArgs) prop_mul_asso                  -- ✓
+  quickCheckWith (stdArgs) prop_distribu                  -- ✓
+  quickCheckWith (stdArgs) prop_div_ratio                 -- ✓
   quickCheckWith (stdArgs) prop_prod_of_pow               -- ❌
   quickCheckWith (stdArgs) prop_sqrt_prod                 -- ❌
   quickCheckWith (stdArgs) prop_pretty_parse_round_trip   -- ✓
