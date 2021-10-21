@@ -21,7 +21,7 @@ eval3 expr' = case eval expr' of
 
 main :: IO ()
 main = do
-  putStrLn "Enter an expression:"
+  putStrLn "Enter an expression :"
   e <- getLine
   case runParser parseExpression "input" e of
     Left err -> putStrLn (errorBundlePretty err)
