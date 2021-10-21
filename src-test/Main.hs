@@ -46,7 +46,15 @@ prop_add_fail_comm (BadExpr x) (BadExpr y) = eval (Operator Add x y) === eval (O
 
 -- TODO : handle nonzero z, failing - decimal digits don't match (after 7-8 places)
 prop_div_ratio :: Expression -> Expression -> Expression -> Property
-prop_div_ratio x y z = eval (Operator Div x y) === eval (Operator Div (Operator Div x z) (Operator Div y z)) -- (x/y) = ((x/z) / (y/z))
+prop_div_ratio x' y' z' =
+  let
+    (Right (x'',_)) = eval x'
+    (Right (y'',_)) = eval y'
+    (Right (z'',_)) = eval z'
+    (x,y,z) = if z'' /= 0
+      then (Number x'',Number y'',Number z'')
+      else (Number x'',Number y'',Number 1.0)
+  in eval (Operator Div x y) === eval (Operator Div (Operator Div x z) (Operator Div y z)) -- (x/y) = ((x/z) / (y/z))
   -- z /= 0 ==> eval (Operator Div x y) === eval (Operator Div (Operator Div x z) (Operator Div y z))
 
 -- Number (-0.2527207028827523)
@@ -56,14 +64,13 @@ prop_div_ratio x y z = eval (Operator Div x y) === eval (Operator Div (Operator 
 prop_prod_of_pow :: Expression -> Expression -> Expression -> Property 
 prop_prod_of_pow x y z = eval (Operator Mult (Operator Pow x y) (Operator Pow x z)) === eval (Operator Pow x (Operator Add y z)) -- Property -> (x^y)(x^z) = x^(y+z)
 
--- decimal digits don't match (after 7-8 places)
 prop_sqrt_prod :: Expression -> Expression -> Property
 prop_sqrt_prod x' y' = 
   let
     (Right (x'',_)) = eval x'
     (Right (y'',_)) = eval y'
     (x,y) = 
-      if (x'' < 0) && (y'' < 0)
+      if (x'' <= 0) && (y'' <= 0)
       then
         let
           x = Number (abs x'')
@@ -74,7 +81,13 @@ prop_sqrt_prod x' y' =
           x = x'
           y = y'
         in (x,y)
-  in eval (Operator Mult (SQR x) (SQR y)) === eval (SQR (Operator Mult x y)) -- Property -> (sqrt x)(sqrt y) = (sqrt x*y)
+    exp1 = case eval (Operator Mult (SQR x) (SQR y)) of
+      Left ce -> Left ce
+      Right (x3,x4) -> Right (fromRational x3, x4)
+    exp2 = case eval (SQR (Operator Mult x y)) of
+      Left ce -> Left ce
+      Right (x3,x4) -> Right (fromRational x3, x4)
+  in exp1 === exp2 -- Property -> (sqrt x)(sqrt y) = (sqrt x*y)
 
 prop_pretty_parse_round_trip :: Expression -> Property
 prop_pretty_parse_round_trip exp = case runParser parseExpression "inp" (pretty exp) of
@@ -83,15 +96,15 @@ prop_pretty_parse_round_trip exp = case runParser parseExpression "inp" (pretty 
 
 main :: IO ()
 main = do
-  sample (arbitrary @Double)
+  -- sample (arbitrary @Double)
   -- sample (resize 1 $ arbitrary @Expression)
   -- sample (resize 2 $ arbitrary @Expression)
   quickCheckWith (stdArgs) prop_add_comm                  -- ✓
   quickCheckWith (stdArgs) prop_mul_comm                  -- ✓
-  quickCheckWith (stdArgs) prop_add_asso                  -- ❌
-  quickCheckWith (stdArgs) prop_mul_asso                  -- ❌
-  quickCheckWith (stdArgs) prop_distribu                  -- ❌
-  quickCheckWith (stdArgs) prop_div_ratio                 -- ❌
-  quickCheckWith (stdArgs) prop_prod_of_pow               -- ❌
-  quickCheckWith (stdArgs) prop_sqrt_prod                 -- ❌
+  quickCheckWith (stdArgs) prop_add_asso                  -- ✓
+  quickCheckWith (stdArgs) prop_mul_asso                  -- ✓
+  quickCheckWith (stdArgs) prop_distribu                  -- ✓
+  quickCheckWith (stdArgs) prop_div_ratio                 -- ✓
+  verboseCheckWith (stdArgs) prop_prod_of_pow               -- ❌
+  verboseCheckWith (stdArgs) prop_sqrt_prod                 -- ❌
   quickCheckWith (stdArgs) prop_pretty_parse_round_trip   -- ✓
